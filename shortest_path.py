@@ -1,7 +1,22 @@
 import re
 
 
-# takes a path to file representing the nodes in the hexagonal grid
+# Node class used to store properties of each node
+class Node():
+    def __init__(self, _position, _cost):
+        self.position = _position
+        self.cost = _cost
+        self.adjacent_nodes = []
+        
+        self.is_left_edge = False
+        self.is_right_edge = False
+        self.is_top_edge = False
+        self.is_bottom_edge = False
+        
+        self.isGoalNode = False
+        self.isStartingNode = False
+
+# takes path to the file representing the nodes in the hexagonal grid
 # returns a list of tuples (num, cost)
 def get_node_list(path_to_file):
     nodes = []
@@ -14,18 +29,9 @@ def get_node_list(path_to_file):
         f.close()
     return nodes
 
-
-class Node():
-
-    def __init__(self, _position, _cost):
-        self.position = _position
-        self.cost = _cost
-        self.adjacent_nodes = []
-        self.is_left_edge = False
-        self.is_right_edge = False
-        self.is_top_edge = False
-        self.is_bottom_edge = False
-
+# takes a list of tuples where each tuple represents a hexagon
+# and has the form (position, cost). builds an array of Node objects
+# where each Node stores an array of every node that is adjacent
 def create_map_of_nodes(nodeList, map_width):
     node_map = []
     for n in nodeList:
@@ -100,12 +106,15 @@ def create_map_of_nodes(nodeList, map_width):
                 candidate_nodes.append(node_map[bottom_center])
             candidate_nodes.append(node_map[bottom_left])
 
+        # dont add nodes that have a cost of -1
+        # since those nodes are off limits for the pathfinding algorithm
         for c in candidate_nodes:
             if c.cost > 0:
                 node.adjacent_nodes.append(c)
     
     return node_map
 
+# sets flags for each node that is on an edge
 def assign_edge_nodes(node_map, width):
     for i in range(0, len(node_map)-width+1, 2*width-1):
         node_map[i].is_left_edge = True

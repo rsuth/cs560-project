@@ -1,8 +1,9 @@
 import unittest
 import shortest_path
 
-class KnownInput(unittest.TestCase):
+class BuildNodeMap(unittest.TestCase):
     valid_file = 'valid_file'
+    bad_file_path = 'asdf'
     file_lines = 13
     expected_result = [
         (1, -1),
@@ -19,6 +20,9 @@ class KnownInput(unittest.TestCase):
         (12, 8),
         (13, 8),
     ]
+    
+    def testBadFile(self):
+        self.assertRaises(FileNotFoundError, shortest_path.get_node_list, self.bad_file_path)
     
     def testCorrectNumberOfNodes(self):
         self.assertEqual(len(shortest_path.get_node_list(self.valid_file)),self.file_lines)
@@ -52,11 +56,7 @@ class KnownInput(unittest.TestCase):
         self.assertFalse(node_map[0] in node_map[12].adjacent_nodes)
         self.assertFalse(node_map[12] in node_map[0].adjacent_nodes)
         self.assertFalse(node_map[8] in node_map[9].adjacent_nodes)
-
-
-class BadFileInput(unittest.TestCase):
-    bad_file_path = 'asdf'
-    def testBadFile(self):
-        self.assertRaises(FileNotFoundError, shortest_path.get_node_list, self.bad_file_path)
+    
+    
 
 
