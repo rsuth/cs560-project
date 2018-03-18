@@ -7,12 +7,10 @@ class Node():
         self.position = _position
         self.cost = _cost
         self.adjacent_nodes = []
-        
         self.is_left_edge = False
         self.is_right_edge = False
         self.is_top_edge = False
         self.is_bottom_edge = False
-        
         self.isGoalNode = False
         self.isStartingNode = False
 
@@ -28,6 +26,17 @@ def get_node_list(path_to_file):
             nodes.append((pos, cost))
         f.close()
     return nodes
+
+# sets flags for each node that is on an edge
+def assign_edge_nodes(node_map, width):
+    for i in range(0, len(node_map)-width+1, 2*width-1): 
+        node_map[i].is_left_edge = True
+    for i in range(width-1, len(node_map), 2*width-1): 
+        node_map[i].is_right_edge = True
+    for i in range(0, width): 
+        node_map[i].is_top_edge = True
+    for i in range(len(node_map)-width, len(node_map)): 
+        node_map[i].is_bottom_edge = True
 
 # takes a list of tuples where each tuple represents a hexagon
 # and has the form (position, cost). builds an array of Node objects
@@ -108,20 +117,16 @@ def create_map_of_nodes(nodeList, map_width):
 
         # dont add nodes that have a cost of -1
         # since those nodes are off limits for the pathfinding algorithm
-        for c in candidate_nodes:
-            if c.cost > 0:
+        for c in candidate_nodes: 
+            if c.cost > 0: 
                 node.adjacent_nodes.append(c)
     
     return node_map
 
-# sets flags for each node that is on an edge
-def assign_edge_nodes(node_map, width):
-    for i in range(0, len(node_map)-width+1, 2*width-1):
-        node_map[i].is_left_edge = True
-    for i in range(width-1, len(node_map), 2*width-1):
-        node_map[i].is_right_edge = True
-    for i in range(0, width):
-        node_map[i].is_top_edge = True
-    for i in range(len(node_map)-width, len(node_map)):
-        node_map[i].is_bottom_edge = True
+nodes = get_node_list('inputfile')
+node_map = create_map_of_nodes(nodes,3)
+
+for n in node_map: 
+    print('node: %2d | cost: %2d | connected to %d nodes' % (n.position, n.cost, len(n.adjacent_nodes)))
+
 
