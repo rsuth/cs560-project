@@ -1,6 +1,7 @@
 import unittest
 import shortest_path
 
+
 class BuildNodeMap(unittest.TestCase):
     valid_file = 'valid_file'
     bad_file_path = 'asdf'
