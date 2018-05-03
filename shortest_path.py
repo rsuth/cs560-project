@@ -1,3 +1,9 @@
+#!/usr/bin/env python3
+
+# CS560 Spring 2018 Group Project
+# Minimal-Cost Path through a Hexagonally-Tiled Map
+# Group 17 
+
 import re
 import sys
 import heapq
@@ -21,6 +27,7 @@ class Node():
         self.visited = False
         self.got_here_from = None
 
+    # define comparison of Node objects, used in the heap.
     def __lt__(self, other):
         return self.cost_to_get_here < other.cost_to_get_here
 
@@ -41,9 +48,10 @@ def get_node_list(path_to_file):
         try:
             for line in f:
                 m = re.match(re.compile(r'(\d+)\s+(-?\d+)'), line)
-                pos = int(m.group(1))
-                cost = int(m.group(2))
-                nodes.append((pos, cost))
+                if m is not None:
+                    pos = int(m.group(1))
+                    cost = int(m.group(2))
+                    nodes.append((pos, cost))
         except AttributeError as e:
             print("invalid line in input file:\n%s" % line)
         f.close()
@@ -64,14 +72,20 @@ def assign_edge_nodes(node_map, width):
 # and has the form (position, cost). returns a list of Node objects
 # where each Node stores a list of every node that is adjacent
 def create_node_map(path_to_file, map_width):
+    # get input from file
     nodeList = get_node_list(path_to_file)
+    
     node_map = []
+    
+    # build array of Node objects (not yet connected)
     for n in nodeList:
         node = Node(n[0], n[1])
         node_map.append(node)
 
+    # set flags for the nodes that are on the edges
     assign_edge_nodes(node_map, map_width)
 
+    # assign adjacent nodes, build the graph
     for node in node_map:
         candidate_nodes = []
         top_center = (node.position - 1) - (2*map_width - 1)
@@ -155,10 +169,14 @@ def djikstras_shortest_path(node_map):
     visited = []
     unvisited = []
 
+    # push all the nodes onto the heap of unvisited nodes.
     for n in node_map:
         heapq.heappush(unvisited, (n, n.position))
 
+    # start at the first node on the heap, the starting node.
     current = unvisited[0][0]
+    
+    # djikstras algorithm
     while current.is_goal_node is False:
         current = unvisited[0][0]
         for n in current.adjacent_nodes:
@@ -168,28 +186,30 @@ def djikstras_shortest_path(node_map):
         visited.append(heapq.heappop(unvisited))
         heapq.heapify(unvisited)
 
-    n = visited[-1][0]
+    # path array will store the path
     path = []
-
+    
+    # the last (goal) node
+    n = visited[-1][0]
+    
+    # go backwards from the goal node, building the path.
     while n.is_starting_node is False:
         path.insert(0, n)
         n = n.got_here_from
 
-    path.insert(0, visited[0][0])  # add the last (starting) node
+    # add the first (starting) node
+    path.insert(0, visited[0][0])
 
     return path
 
+# main program:
 
-start = time.time()
-
-node_map = create_node_map('INPUT.TXT', 8)
+node_map = create_node_map(sys.argv[1], 8)
 shortest_path = djikstras_shortest_path(node_map)
 cost = shortest_path[-1].cost_to_get_here
 
-
-for n in shortest_path:
-    print(n.position)
-print("MINIMAL-COST PATH COSTS: %d" % cost)
-
-end = time.time()
-print("completed in %f seconds" % (end-start))
+with open("output.txt", mode='w') as f:
+    for n in shortest_path:
+        f.write(str(n.position)+"\n")
+    f.write("MINIMAL-COST PATH COSTS: %d" % cost)
+    f.close()
