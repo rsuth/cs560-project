@@ -1,13 +1,12 @@
 from searchstrategies import Djikstra
 
 class HexGrid:
-
     def __init__(self, nodes, position=226, g = Djikstra.g ):
         self.goal_state = 8
         self.nodes = nodes
         self.position = position
         self.initial=226
-        self.g = g
+        self.g = gs
 
     def goal_test(self, position):
         return position == self.goal_state

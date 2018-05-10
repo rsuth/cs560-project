@@ -3,14 +3,15 @@ from HexGrid import HexGrid
 from problemsearch import graph_search
 import time
 
-path_to_file = 'inputfile.txt'
+path_to_file = 'test_input_2.txt'
 
 nodes = []
 nodes.append(0)
 with open(path_to_file) as input:
     for line in input:
         m = re.match(re.compile(r'(\d+) (-?\d+)'), line)
-        nodes.append(int(m.group(2)))
+        if line != '\n':
+            nodes.append(int(m.group(2)))
     input.close()
 
 def tic():
@@ -25,7 +26,8 @@ start = tic()
 test = HexGrid(nodes)
 solution = graph_search(test)
 
-for node in solution[0]:
-    print(node)
-print("MINIMAL-COST PATH COSTS: "+str(solution[1]))
-print(tock(start))
+output_file = open('output.txt', 'w+')
+for node in reversed(solution[0]):
+    output_file.write(str(node) + '\n')
+output_file.write("MINIMAL-COST PATH COSTS: "+str(solution[1]) + '\n')
+output_file.write(str(tock(start)))
